@@ -10,9 +10,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_07_090201) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_08_120536) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "services", force: :cascade do |t|
+    t.string "name", limit: 100, null: false
+    t.integer "duration_minutes", null: false
+    t.decimal "price", precision: 8, scale: 2, null: false
+    t.text "description"
+    t.boolean "active", default: true, null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_services_on_user_id"
+    t.check_constraint "duration_minutes > 0 AND duration_minutes <= 480", name: "services_duration_minutes_range"
+    t.check_constraint "price >= 0::numeric", name: "services_price_non_negative"
+  end
 
   create_table "sessions", force: :cascade do |t|
     t.bigint "user_id", null: false
@@ -31,5 +45,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_090201) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "services", "users"
   add_foreign_key "sessions", "users"
 end

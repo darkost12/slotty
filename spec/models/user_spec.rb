@@ -22,6 +22,7 @@ RSpec.describe User, type: :model do
   it { is_expected.to allow_value("a@b.co").for(:email_address) }
   it { is_expected.not_to allow_value("not-an-email").for(:email_address) }
   it { is_expected.to validate_length_of(:password).is_at_least(8) }
+  it { is_expected.to have_many(:services).dependent(:destroy) }
 
   it "normalizes email" do
     expect(build(:user, email_address: " Me@Example.COM ").email_address).to eq("me@example.com")
