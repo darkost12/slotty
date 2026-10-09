@@ -4,6 +4,18 @@
   @apply w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer;
 }
 
+.secondary-button {
+  @apply w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium;
+}
+
+.danger-button {
+  @apply w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer;
+}
+
 .input {
   @apply block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 w-full;
+}
+
+.input-error {
+  @apply border-red-400 focus:outline-red-600;
 }

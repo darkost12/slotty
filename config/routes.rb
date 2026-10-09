@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   root "dashboard#show"
   resource :session
   resource :registration, only: %i[new create]
+  resources :services, except: %i[show]
   resources :passwords, param: :token
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

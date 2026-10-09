@@ -26,5 +26,7 @@ class Service < ApplicationRecord
   validates :name, presence: true, length: { maximum: 100 }
   validates :duration_minutes, presence: true,
     numericality: { greater_than: 0, less_than_or_equal_to: 480, only_integer: true }
-  validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :price, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 999999.99 }
+
+  scope :active, -> { where(active: true) }
 end

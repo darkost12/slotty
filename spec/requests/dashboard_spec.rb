@@ -10,7 +10,7 @@ RSpec.describe "Dashboard", type: :request do
 
     it "shows the dashboard to signed-in users" do
       user = create(:user, password: "password123")
-      post session_path, params: { email_address: user.email_address, password: "password123" }
+      sign_in(user, password: "password123")
 
       get root_path
 
