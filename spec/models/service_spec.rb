@@ -33,7 +33,7 @@ RSpec.describe Service, type: :model do
   it { is_expected.to validate_length_of(:name).is_at_most(100) }
   it { is_expected.to allow_value("480").for(:duration_minutes) }
   it { is_expected.not_to allow_value("0" * 101).for(:name) }
-  it { is_expected.to validate_numericality_of(:price).is_greater_than_or_equal_to(0) }
+  it { is_expected.to validate_numericality_of(:price).is_greater_than_or_equal_to(0).is_less_than_or_equal_to(999999.99) }
   it do
     is_expected
       .to validate_numericality_of(:duration_minutes)
