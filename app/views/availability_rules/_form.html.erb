@@ -1,0 +1,35 @@
+<%= form_with model: availability_rule, class: "mt-4" do |form| %>
+  <% if availability_rule.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mb-4">
+      <ul class="list-disc ml-6">
+        <% availability_rule.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="flex flex-col sm:flex-row gap-4 sm:items-end">
+    <div class="flex-1">
+      <%= form.label :weekday %>
+      <%= form.select :weekday,
+            AvailabilityRule::DISPLAY_ORDER.map { |day| [day.capitalize, day] },
+            {},
+            class: ["input", { "input-error": availability_rule.errors[:weekday].any? }] %>
+    </div>
+
+    <div class="flex-1">
+      <%= form.label :start_time %>
+      <%= form.time_field :start_time, step: 60,
+            class: ["input", { "input-error": availability_rule.errors[:start_time].any? }] %>
+    </div>
+
+    <div class="flex-1">
+      <%= form.label :end_time %>
+      <%= form.time_field :end_time, step: 60,
+            class: ["input", { "input-error": availability_rule.errors[:end_time].any? }] %>
+    </div>
+
+    <%= form.submit "Add", class: "primary-button" %>
+  </div>
+<% end %>

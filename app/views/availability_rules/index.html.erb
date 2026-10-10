@@ -1,0 +1,35 @@
+<% content_for :title, "Schedule" %>
+
+<div class="md:w-2/3 w-full">
+  <h1 class="font-bold text-4xl">Schedule</h1>
+  <p class="text-gray-500 mt-2">Weekly working hours. Clients can book only inside these intervals.</p>
+
+  <div id="schedule" class="mt-6 divide-y divide-gray-200">
+    <% AvailabilityRule::DISPLAY_ORDER.each do |weekday| %>
+      <div class="py-3 flex gap-4">
+        <span class="w-28 font-medium"><%= weekday.capitalize %></span>
+
+        <div class="flex-1 space-y-2">
+          <% rules = @rules_by_weekday.fetch(weekday, []) %>
+          <% if rules.empty? %>
+            <span class="text-gray-400">Day off</span>
+          <% else %>
+            <% rules.each do |rule| %>
+              <div id="<%= dom_id rule %>" class="flex items-center justify-between">
+                <span><%= rule.start_time.strftime("%H:%M") %>–<%= rule.end_time.strftime("%H:%M") %></span>
+                <%= button_to "Remove", availability_rule_path(rule), method: :delete,
+                      class: "text-sm text-red-600 hover:underline cursor-pointer",
+                      data: { turbo_confirm: "Remove this interval?" } %>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <h2 class="font-bold text-2xl mt-10">Add interval</h2>
+  <%= render "form", availability_rule: @availability_rule %>
+
+  <%= link_to "Back to dashboard", root_path, class: "secondary-button mt-6" %>
+</div>

@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   resource :session
   resource :registration, only: %i[new create]
   resources :services, except: %i[show]
+  resources :availability_rules, only: %i[index create destroy]
   resources :passwords, param: :token
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
