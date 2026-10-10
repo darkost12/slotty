@@ -16,6 +16,7 @@ class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_many :services, dependent: :destroy
+  has_many :availability_rules, dependent: :destroy
 
   validates :email_address, presence: true, uniqueness: true,
                             format: { with: URI::MailTo::EMAIL_REGEXP }

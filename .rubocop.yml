@@ -17,6 +17,6 @@ Layout/ElseAlignment:
 Layout/BlockAlignment:
   Enabled: true
 Layout/MultilineMethodCallIndentation:
-  Enabled: true
+  Enabled: false
 Layout/SpaceInsideArrayLiteralBrackets:
   Enabled: false

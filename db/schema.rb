@@ -10,9 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_08_120536) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_09_143143) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "availability_rules", force: :cascade do |t|
+    t.integer "weekday", limit: 2, null: false
+    t.time "start_time", null: false
+    t.time "end_time", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "weekday"], name: "index_availability_rules_on_user_id_and_weekday"
+    t.check_constraint "end_time > start_time", name: "availability_rules_end_after_start"
+    t.check_constraint "weekday >= 0 AND weekday <= 6", name: "availability_rules_weekday_range"
+  end
 
   create_table "services", force: :cascade do |t|
     t.string "name", limit: 100, null: false
@@ -45,6 +57,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_120536) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "availability_rules", "users"
   add_foreign_key "services", "users"
   add_foreign_key "sessions", "users"
 end
