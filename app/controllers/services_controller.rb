@@ -31,9 +31,11 @@ class ServicesController < ApplicationController
   end
 
   def destroy
-    @service.destroy!
-
-    redirect_to services_path, notice: "Service was successfully destroyed.", status: :see_other
+    if @service.destroy
+      redirect_to services_path, notice: "Service was successfully destroyed.", status: :see_other
+    else
+      redirect_to services_path, alert: "This service has bookings. Make it inactive instead.", status: :see_other
+    end
   end
 
   private

@@ -107,6 +107,16 @@ RSpec.describe "Services", type: :request do
 
         expect(response).to redirect_to(services_path)
       end
+
+      it "keeps a service that has bookings" do
+        service = create(:service, user: user)
+        create(:booking, service: service)
+
+        expect { delete service_path(service) }.not_to change(Service, :count)
+
+        expect(response).to redirect_to(services_path)
+        expect(flash[:alert]).to include("has bookings")
+      end
     end
 
     context "with another user's service" do

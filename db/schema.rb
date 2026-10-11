@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_09_143143) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_10_120100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -24,6 +24,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_09_143143) do
     t.index ["user_id", "weekday"], name: "index_availability_rules_on_user_id_and_weekday"
     t.check_constraint "end_time > start_time", name: "availability_rules_end_after_start"
     t.check_constraint "weekday >= 0 AND weekday <= 6", name: "availability_rules_weekday_range"
+  end
+
+  create_table "bookings", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "service_id", null: false
+    t.datetime "starts_at", null: false
+    t.datetime "ends_at", null: false
+    t.string "client_name", limit: 100, null: false
+    t.string "client_email", null: false
+    t.integer "status", limit: 2, default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["service_id"], name: "index_bookings_on_service_id"
+    t.index ["user_id", "starts_at"], name: "index_bookings_on_user_id_and_starts_at"
+    t.check_constraint "ends_at > starts_at", name: "bookings_end_after_start"
+    t.check_constraint "status = ANY (ARRAY[0, 1])", name: "bookings_status_values"
   end
 
   create_table "services", force: :cascade do |t|
@@ -54,10 +70,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_09_143143) do
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "slug", limit: 40, null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
+    t.index ["slug"], name: "index_users_on_slug", unique: true
+    t.check_constraint "slug::text ~ '^[a-z0-9-]+$'::text", name: "users_slug_format"
   end
 
   add_foreign_key "availability_rules", "users"
+  add_foreign_key "bookings", "services"
+  add_foreign_key "bookings", "users"
   add_foreign_key "services", "users"
   add_foreign_key "sessions", "users"
 end
