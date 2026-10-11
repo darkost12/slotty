@@ -22,6 +22,8 @@
 #
 class Service < ApplicationRecord
   belongs_to :user
+  # A service with bookings cannot be deleted: the bookings would lose their history.
+  has_many :bookings, dependent: :restrict_with_error
 
   validates :name, presence: true, length: { maximum: 100 }
   validates :duration_minutes, presence: true,
