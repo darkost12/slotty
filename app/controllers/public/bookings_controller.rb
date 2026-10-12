@@ -1,5 +1,7 @@
 module Public
   class BookingsController < BaseController
+    SLOT_TAKEN = "is no longer available. Please pick another time".freeze
+
     before_action :set_service
 
     def new
@@ -17,6 +19,9 @@ module Public
       else
         render :new, status: :unprocessable_content
       end
+    rescue ActiveRecord::ExclusionViolation
+      @booking.errors.add(:starts_at, SLOT_TAKEN)
+      render :new, status: :unprocessable_content
     end
 
     private
@@ -31,13 +36,13 @@ module Public
     end
 
     # The client can send any time in the form, so we accept only times AvailableSlots offers.
-    # Two clients can still pass this check at the same moment — the database will stop that later.
+    # Two clients can still pass this check at the same moment — the exclusion constraint catches that, see rescue in create.
     def slot_available?
       starts_at = @booking.starts_at
       return true if starts_at.nil? # the presence validation will report it
       return true if AvailableSlots.new(service: @service, date: starts_at.to_date).call.include?(starts_at)
 
-      @booking.errors.add(:starts_at, "is no longer available, please pick another time")
+      @booking.errors.add(:starts_at, SLOT_TAKEN)
       false
     end
   end

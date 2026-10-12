@@ -28,6 +28,8 @@ require "rails_helper"
 RSpec.describe Booking, type: :model do
   subject { build(:booking) }
 
+  def at(time) = Time.zone.parse("2026-11-02 #{time}")
+
   it "has a valid factory" do
     expect(create(:booking)).to be_persisted
   end
@@ -99,6 +101,36 @@ RSpec.describe Booking, type: :model do
       booking.cancelled!
 
       expect(overlapping("10:30", "11:30")).to be_empty
+    end
+  end
+
+  describe "double booking protection" do
+    let(:service) { create(:service, duration_minutes: 30) }
+
+    let(:existing) { create(:booking, service:, starts_at: at("10:00")) }
+
+    before { existing }
+
+    it "rejects an overlapping booking of the same master" do
+      expect { create(:booking, service:, starts_at: at("10:15")) }
+        .to raise_error(ActiveRecord::ExclusionViolation)
+    end
+
+    it "allows a booking right after another" do
+      expect { create(:booking, service:, starts_at: at("10:30")) }.not_to raise_error
+    end
+
+    it "allows the time of a cancelled booking" do
+      existing.cancelled!
+
+      expect { create(:booking, service:, starts_at: at("10:15")) }
+        .not_to raise_error
+    end
+
+    it "allows the same time for another master" do
+      expect {
+        create(:booking, service: create(:service, duration_minutes: 30), starts_at: at("10:15"))
+      }.not_to raise_error
     end
   end
 end
