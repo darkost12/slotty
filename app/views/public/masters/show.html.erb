@@ -1,0 +1,18 @@
+<% content_for :title, "Book with #{@master.slug}" %>
+
+<div class="md:w-2/3 w-full">
+  <h1 class="font-bold text-4xl">Book with <%= @master.slug %></h1>
+  <p class="text-gray-500 mt-2">Choose a service.</p>
+
+  <div id="services" class="mt-6 divide-y divide-gray-200">
+    <% if @services.any? %>
+      <% @services.each do |service| %>
+        <%= link_to public_service_path(@master.slug, service), class: "block px-2 hover:bg-gray-50" do %>
+          <%= render "services/service", service: service %>
+        <% end %>
+      <% end %>
+    <% else %>
+      <p class="text-gray-400 py-10">No services available yet.</p>
+    <% end %>
+  </div>
+</div>

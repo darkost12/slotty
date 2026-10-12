@@ -1,0 +1,38 @@
+<% content_for :title, @service.name %>
+
+<div class="md:w-2/3 w-full">
+  <%= link_to "← All services", public_master_path(@master.slug), class: "text-blue-600 hover:underline" %>
+
+  <h1 class="font-bold text-4xl mt-4"><%= @service.name %></h1>
+  <p class="text-gray-500 mt-2">
+    <%= @service.duration_minutes %> min · <%= number_to_currency(@service.price, unit: "₾") %>
+  </p>
+  <% if @service.description.present? %>
+    <p class="mt-4"><%= @service.description %></p>
+  <% end %>
+
+  <div id="days" class="mt-8 flex gap-2 overflow-x-auto pb-2">
+    <% @days.each do |day| %>
+      <%= link_to public_service_path(@master.slug, @service, date: day.iso8601),
+            class: ["shrink-0 rounded-md border px-3 py-2 text-center",
+                    day == @date ? "bg-blue-600 border-blue-600 text-white" : "border-gray-300 hover:bg-gray-50"] do %>
+        <span class="block text-xs"><%= day.strftime("%a") %></span>
+        <span class="block font-medium"><%= day.strftime("%-d %b") %></span>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div id="slots" class="mt-6">
+    <% if @slots.any? %>
+      <div class="grid grid-cols-3 sm:grid-cols-5 gap-2">
+        <% @slots.each do |slot| %>
+          <%= link_to slot.strftime("%H:%M"),
+                new_public_service_booking_path(@master.slug, @service, starts_at: slot.iso8601),
+                class: "rounded-md border border-gray-300 px-3 py-2 text-center hover:border-blue-600 hover:text-blue-600" %>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-gray-400">No free time on this day.</p>
+    <% end %>
+  </div>
+</div>

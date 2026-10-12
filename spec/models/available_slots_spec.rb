@@ -80,4 +80,15 @@ RSpec.describe AvailableSlots do
 
     expect(slots).to eql([])
   end
+
+  context 'another service booked' do
+    let(:another_service) { create(:service, user: master, duration_minutes: 30) }
+
+    it 'keeps another service in mind' do
+      create(:availability_rule, user: master, weekday: :monday, start_time: "10:00", end_time: "11:00")
+      create(:booking, service: another_service, user: master, starts_at: at("10:00"), ends_at: at("10:30"))
+
+      expect(slots).to eql([at("10:30")])
+    end
+  end
 end
