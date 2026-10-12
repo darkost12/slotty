@@ -5,6 +5,14 @@ Rails.application.routes.draw do
   resources :services, except: %i[show]
   resources :availability_rules, only: %i[index create destroy]
   resources :passwords, param: :token
+
+  # Public booking pages for clients, no sign in: /book/<master slug>/...
+  scope "book/:slug", module: :public, as: :public do
+    get "/", to: "masters#show", as: :master
+    resources :services, only: :show do
+      resources :bookings, only: %i[new create]
+    end
+  end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

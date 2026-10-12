@@ -1,0 +1,42 @@
+<% content_for :title, "Book #{@service.name}" %>
+
+<div class="md:w-1/2 w-full">
+  <%= link_to "← Pick another time",
+        public_service_path(@master.slug, @service, date: @booking.starts_at&.to_date&.iso8601),
+        class: "text-blue-600 hover:underline" %>
+
+  <h1 class="font-bold text-4xl mt-4"><%= @service.name %></h1>
+  <p class="text-gray-500 mt-2">
+    <% if @booking.starts_at %><%= l(@booking.starts_at, format: :long) %> · <% end %>
+    <%= @service.duration_minutes %> min · <%= number_to_currency(@service.price, unit: "₾") %>
+  </p>
+
+  <%= form_with model: @booking, url: public_service_bookings_path(@master.slug, @service), class: "mt-6" do |form| %>
+    <% if @booking.errors.any? %>
+      <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mb-4">
+        <ul class="list-disc ml-6">
+          <% @booking.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%# The time was chosen on the previous page; the server checks it again on create. %>
+    <%= form.hidden_field :starts_at, value: @booking.starts_at&.iso8601 %>
+
+    <div class="my-5">
+      <%= form.label :client_name, "Your name" %>
+      <%= form.text_field :client_name, maxlength: 100,
+            class: ["input", { "input-error": @booking.errors[:client_name].any? }] %>
+    </div>
+
+    <div class="my-5">
+      <%= form.label :client_email, "Email" %>
+      <%= form.email_field :client_email,
+            class: ["input", { "input-error": @booking.errors[:client_email].any? }] %>
+    </div>
+
+    <%= form.submit "Book", class: "primary-button" %>
+  <% end %>
+</div>
