@@ -10,8 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_10_120100) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_12_114639) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
 
   create_table "availability_rules", force: :cascade do |t|
@@ -40,6 +41,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_10_120100) do
     t.index ["user_id", "starts_at"], name: "index_bookings_on_user_id_and_starts_at"
     t.check_constraint "ends_at > starts_at", name: "bookings_end_after_start"
     t.check_constraint "status = ANY (ARRAY[0, 1])", name: "bookings_status_values"
+    t.exclusion_constraint "user_id WITH =, tsrange(starts_at, ends_at, '[)'::text) WITH &&", where: "status = 0", using: :gist, name: "bookings_no_overlap"
   end
 
   create_table "services", force: :cascade do |t|

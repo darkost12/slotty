@@ -86,5 +86,15 @@ RSpec.describe "Public booking", type: :request do
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include("no longer available")
     end
+
+    it "shows an error when the slot was taken at the same moment" do
+      create(:booking, service: service, starts_at: at("10:00"))
+      allow_any_instance_of(AvailableSlots).to receive(:call).and_return([at("10:00")])
+
+      expect { book(at("10:00")) }.not_to change(Booking, :count)
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include("no longer available")
+    end
   end
 end
