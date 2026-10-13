@@ -4,6 +4,9 @@ Rails.application.routes.draw do
   resource :registration, only: %i[new create]
   resources :services, except: %i[show]
   resources :availability_rules, only: %i[index create destroy]
+  resources :bookings, only: :index do
+    patch :cancel, on: :member
+  end
   resources :passwords, param: :token
 
   # Public booking pages for clients, no sign in: /book/<master slug>/...

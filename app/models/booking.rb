@@ -44,6 +44,7 @@ class Booking < ApplicationRecord
   # Confirmed bookings that take up the master's time somewhere between from and to.
   # Same overlap rule as in AvailabilityRule: touching intervals do not overlap.
   scope :overlapping, ->(from, to) { confirmed.where("starts_at < ? AND ends_at > ?", to, from) }
+  scope :upcoming, -> { confirmed.where("ends_at > ?", Time.current).order(:starts_at) }
 
   private
 
