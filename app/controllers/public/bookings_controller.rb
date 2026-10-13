@@ -14,6 +14,8 @@ module Public
       @booking = @service.bookings.new(booking_params)
 
       if slot_available? && @booking.save
+        BookingMailer.confirmation(@booking).deliver_later
+
         redirect_to public_master_path(@master.slug),
           notice: "You're booked: #{@service.name}, #{l(@booking.starts_at, format: :long)}."
       else

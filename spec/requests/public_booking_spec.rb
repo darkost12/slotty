@@ -64,7 +64,9 @@ RSpec.describe "Public booking", type: :request do
     end
 
     it "books a free slot" do
-      expect { book(at("10:15")) }.to change(master.bookings, :count).by(1)
+      expect { book(at("10:15")) }
+        .to change(master.bookings, :count).by(1)
+        .and have_enqueued_mail(BookingMailer, :confirmation)
 
       expect(response).to redirect_to(public_master_path(master.slug))
       expect(master.bookings.last).to have_attributes(
@@ -81,7 +83,9 @@ RSpec.describe "Public booking", type: :request do
     it "rejects a slot that is already taken" do
       create(:booking, service: service, starts_at: at("10:00"))
 
-      expect { book(at("10:15")) }.not_to change(Booking, :count)
+      expect { book(at("10:15")) }
+        .to not_change(Booking, :count)
+        .and not_have_enqueued_mail
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include("no longer available")
@@ -91,7 +95,9 @@ RSpec.describe "Public booking", type: :request do
       create(:booking, service: service, starts_at: at("10:00"))
       allow_any_instance_of(AvailableSlots).to receive(:call).and_return([at("10:00")])
 
-      expect { book(at("10:00")) }.not_to change(Booking, :count)
+      expect { book(at("10:00")) }
+        .to not_change(Booking, :count)
+        .and not_have_enqueued_mail
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include("no longer available")

@@ -1,0 +1,14 @@
+<p>Hi <%= @booking.client_name %>,</p>
+
+<p>Your booking is confirmed:</p>
+
+<ul>
+  <li><strong><%= @service.name %></strong></li>
+  <li><%= l(@booking.starts_at, format: :long) %>–<%= @booking.ends_at.strftime("%H:%M") %></li>
+  <li><%= number_to_currency(@service.price, unit: "₾") %></li>
+</ul>
+
+<p>
+  Need another time? Book again on
+  <%= link_to "#{@master.slug}'s page", public_master_url(@master.slug) %>.
+</p>
