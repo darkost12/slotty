@@ -79,15 +79,20 @@ RSpec.describe Booking, type: :model do
 
   describe ".overlapping" do
     let(:service) { create(:service) }
-    let!(:booking) do
-      create(:booking, service: service,
-                       starts_at: Time.zone.parse("2026-11-02 10:00"),
-                       ends_at: Time.zone.parse("2026-11-02 11:00"))
+    let(:booking) do
+      create(
+        :booking,
+        service: service,
+        starts_at: Time.zone.parse("2026-11-02 10:00"),
+        ends_at: Time.zone.parse("2026-11-02 11:00")
+      )
     end
 
     def overlapping(from, to)
       Booking.overlapping(Time.zone.parse("2026-11-02 #{from}"), Time.zone.parse("2026-11-02 #{to}"))
     end
+
+    before { booking }
 
     it "finds a partial overlap" do
       expect(overlapping("10:30", "11:30")).to include(booking)
@@ -101,6 +106,59 @@ RSpec.describe Booking, type: :model do
       booking.cancelled!
 
       expect(overlapping("10:30", "11:30")).to be_empty
+    end
+  end
+
+  describe '.upcoming' do
+    let(:service) { create(:service) }
+
+    let(:old) do
+      create(
+        :booking,
+        service: service,
+        starts_at: Time.zone.parse("2026-11-02 09:00"),
+        ends_at: Time.zone.parse("2026-11-02 10:00")
+      )
+    end
+
+    let(:current) do
+      create(
+        :booking,
+        service: service,
+        starts_at: Time.zone.parse("2026-11-02 10:00"),
+        ends_at: Time.zone.parse("2026-11-02 11:00")
+      )
+    end
+
+    let(:cancelled) do
+      create(
+        :booking,
+        status: :cancelled,
+        service: service,
+        starts_at: Time.zone.parse("2026-11-02 10:00"),
+        ends_at: Time.zone.parse("2026-11-02 11:00")
+      )
+    end
+
+    let(:future) do
+      create(
+        :booking,
+        service: service,
+        starts_at: Time.zone.parse("2026-11-02 11:00"),
+        ends_at: Time.zone.parse("2026-11-02 12:00")
+      )
+    end
+
+    before do
+      future
+      cancelled
+      old
+      current
+      travel_to Time.zone.parse("2026-11-02 10:15")
+    end
+
+    it 'returns only upcoming bookings' do
+      expect(Booking.upcoming).to eq([current, future])
     end
   end
 
